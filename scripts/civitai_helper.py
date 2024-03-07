@@ -39,12 +39,33 @@ model.get_custom_model_folder()
 # All settings now must be saved from setting page.
 def on_ui_settings():
     ch_section = ("civitai_helper", "Civitai Helper")
+    
+    # get civitai_api from cmd_args
+    parser = modules.cmd_args.parser
+    args = parser.parse_args()
     # settings
     shared.opts.add_option("ch_max_size_preview", shared.OptionInfo(True, "Download Max Size Preview", gr.Checkbox, {"interactive": True}, section=ch_section))
-    shared.opts.add_option("ch_skip_nsfw_preview", shared.OptionInfo(False, "Skip NSFW Preview Images", gr.Checkbox, {"interactive": True}, section=ch_section))
+    shared.opts.add_option("ch_skip_nsfw_preview", shared.OptionInfo(False, "Skip NSFW Preview Images", gr.Checkbox, {"interactive": False}, section=ch_section))
     shared.opts.add_option("ch_open_url_with_js", shared.OptionInfo(True, "Open Url At Client Side", gr.Checkbox, {"interactive": True}, section=ch_section))
     shared.opts.add_option("ch_proxy", shared.OptionInfo("", "Civitai Helper Proxy", gr.Textbox, {"interactive": True, "lines":1, "info":"format: socks5h://127.0.0.1:port"}, section=ch_section))
     shared.opts.add_option("ch_civiai_api_key", shared.OptionInfo("", "Civitai API Key", gr.Textbox, {"interactive": True, "lines":1, "info":"check doc:https://github.com/zixaphir/Stable-Diffusion-Webui-Civitai-Helper/tree/master#api-key"}, section=ch_section))
+    if args.civitai_api is not None and args.civitai_api != "":
+        shared.opts.data["ch_civiai_api_key"] = args.civitai_api
+    if args.pre_models is not None and args.pre_models != "":
+        # get absolute path
+        pre_models = os.path.abspath(args.pre_models)
+        download_preset_model(pre_models)
+
+def download_preset_model(file):
+    if file:
+        with open(file, "r") as f:
+            urls = f.readlines()
+            for url in urls:
+                download_model_by_url(url.strip())
+
+def download_model_by_url(url):
+    model_data = model_action_civitai.get_model_info_by_url(url)
+    model_action_civitai.dl_model_by_input(model_data[0], model_data[2], model_data[3][0], model_data[4][0], False, True, False)
 
 def on_ui_tabs():
     # init
