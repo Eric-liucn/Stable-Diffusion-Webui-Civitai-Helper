@@ -51,6 +51,9 @@ def on_ui_settings():
     shared.opts.add_option("ch_civiai_api_key", shared.OptionInfo("", "Civitai API Key", gr.Textbox, {"interactive": True, "lines":1, "info":"check doc:https://github.com/zixaphir/Stable-Diffusion-Webui-Civitai-Helper/tree/master#api-key"}, section=ch_section))
     if args.civitai_api is not None and args.civitai_api != "":
         shared.opts.data["ch_civiai_api_key"] = args.civitai_api
+        util.civitai_api_key = args.civitai_api
+        util.def_headers["Authorization"] = f"Bearer {args.civitai_api}"
+        
     if args.pre_models is not None and args.pre_models != "":
         # get absolute path
         pre_models = os.path.abspath(args.pre_models)
