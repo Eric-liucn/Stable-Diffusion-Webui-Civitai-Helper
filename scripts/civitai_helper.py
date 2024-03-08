@@ -64,7 +64,8 @@ def download_preset_model(file):
         with open(file, "r") as f:
             urls = f.readlines()
             for url in urls:
-                download_model_by_url(url.strip())
+                if url.strip() != "" and not url.startswith("#"):
+                    download_model_by_url(url.strip())
 
 def download_model_by_url(url):
     model_data = model_action_civitai.get_model_info_by_url(url)
